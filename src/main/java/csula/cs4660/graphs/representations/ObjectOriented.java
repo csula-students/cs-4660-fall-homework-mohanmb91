@@ -41,7 +41,7 @@ public class ObjectOriented implements Representation {
             	   String[] fromToValue = line.split(":");
             	   edges.add(new Edge(new Node(Integer.parseInt(fromToValue[0])),new Node(Integer.parseInt(fromToValue[1])),Integer.parseInt(fromToValue[2])));
                }
-                System.out.println(line);
+                //System.out.println(line);
                
             });
         } catch (IOException e) {

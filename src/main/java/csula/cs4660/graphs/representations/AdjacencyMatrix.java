@@ -40,7 +40,7 @@ public class AdjacencyMatrix implements Representation {
              	   adjacencyMatrix[Integer.parseInt(fromToValue[0])][Integer.parseInt(fromToValue[1])] = Integer.parseInt(fromToValue[2]);
              	   
                 }
-                 System.out.println(line);
+                 //System.out.println(line);
                 
              });
          } catch (IOException e) {
@@ -67,7 +67,7 @@ public class AdjacencyMatrix implements Representation {
             	   String[] fromToValue = line.split(":");
             	   adjacencyMatrix[Integer.parseInt(fromToValue[0])][Integer.parseInt(fromToValue[1])] = Integer.parseInt(fromToValue[2]);
                }
-                System.out.println(line);
+                //System.out.println(line);
                
             });
         } catch (IOException e) {
@@ -137,7 +137,7 @@ public class AdjacencyMatrix implements Representation {
         				jCountNew += 1;
         				}
         				jCount += 1;
-        				System.out.println(i + " + " + j);
+        				//System.out.println(i + " + " + j);
         			}
         			iCount += 1;
         			if(iCount != (int) x.getData() && jCount != (int) x.getData()){

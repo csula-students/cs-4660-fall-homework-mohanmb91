@@ -49,7 +49,7 @@ public class AdjacencyList implements Representation {
              		 adjacencyList.put(fromNode, edges);
              	  }
                 }
-                 System.out.println(line);
+                 //System.out.println(line);
                 
              });
          } catch (IOException e) {
