@@ -78,9 +78,35 @@ public class AdjacencyMatrix implements Representation {
     @Override
     public boolean addNode(Node x) {
     	if(getNodeIndexByData((int) x.getData()) == null){
+    		// adding a node in nodes array
     		Node[] temp = nodes;
     		nodes = Arrays.copyOf(temp, nodes.length + 1);
     		nodes[nodes.length - 1] = new Node((int) x.getData());
+    		
+    		// adding a row in adjacency matrix
+//    		int[][] tempAdjacency = new int[adjacencyMatrix.length][adjacencyMatrix.length];
+//    		for (int i = 0; i < tempAdjacency.length;i ++){
+//    			for (int j = 0; i < tempAdjacency.length; ++){
+//    				tempAdjacency[i][j] =  
+//    			}
+//    		}
+    		int[][] tempAdjacency = Arrays.copyOf(adjacencyMatrix, adjacencyMatrix.length + 1); 
+
+    		tempAdjacency[adjacencyMatrix.length] = new int[adjacencyMatrix.length]; 
+
+    		for (int i = 0; i < adjacencyMatrix.length; i++) {
+    			tempAdjacency[adjacencyMatrix.length][i] = 0;
+    		}
+    		int [][] finaltemp = new int[adjacencyMatrix.length + 1][adjacencyMatrix.length + 1];
+    		int z = 0;
+    		for (int[] is : tempAdjacency) {
+    			int[] temp1 = Arrays.copyOf(is, is.length + 1);
+    			finaltemp[z] = temp1;
+    			z = z + 1;
+			}
+    		adjacencyMatrix = new int[adjacencyMatrix.length + 1][adjacencyMatrix.length + 1];
+    		adjacencyMatrix = finaltemp;
+    		
     		return true;
 		}
     	return false;
