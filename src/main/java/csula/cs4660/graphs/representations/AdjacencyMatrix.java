@@ -47,32 +47,8 @@ public class AdjacencyMatrix implements Representation {
              e.printStackTrace();
          }
     }
-    
-//    public static void main (String args[]){
-//    	AdjacencyMatrix obj = new AdjacencyMatrix();
-//    }
 
     public AdjacencyMatrix() {
-    	ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("graph-1.txt").getFile());
-        try (Stream<String> stream = Files.lines(file.toPath())) {
-            stream.forEach(line -> {
-               if(line.split(":").length == 1){
-            	   int totalNoOfNodes = Integer.parseInt(line);
-            	   adjacencyMatrix = new int[totalNoOfNodes][totalNoOfNodes];
-            	   nodes = new Node[totalNoOfNodes];
-            	   
-               }
-               else{
-            	   String[] fromToValue = line.split(":");
-            	   adjacencyMatrix[Integer.parseInt(fromToValue[0])][Integer.parseInt(fromToValue[1])] = Integer.parseInt(fromToValue[2]);
-               }
-                //System.out.println(line);
-               
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
