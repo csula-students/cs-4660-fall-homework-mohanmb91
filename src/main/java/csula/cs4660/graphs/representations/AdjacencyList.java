@@ -55,9 +55,9 @@ public class AdjacencyList implements Representation {
          } catch (IOException e) {
              e.printStackTrace();
          }
-    }
+ }
 
-    public AdjacencyList() {
+    protected AdjacencyList() {
 
     }
 
