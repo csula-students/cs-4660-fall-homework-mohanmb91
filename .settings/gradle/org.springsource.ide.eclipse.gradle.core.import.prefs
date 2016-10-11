@@ -1,5 +1,9 @@
 #org.springsource.ide.eclipse.gradle.core.preferences.GradleImportPreferences
+<<<<<<< HEAD
 #Fri Sep 09 19:40:22 PDT 2016
+=======
+#Sat Aug 27 09:44:41 PDT 2016
+>>>>>>> 502c2cb4c88291e45b4cdd0d638c8c84e180012a
 addResourceFilters=true
 afterTasks=afterEclipseImport;
 beforeTasks=cleanEclipse;eclipse;
