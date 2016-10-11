@@ -40,9 +40,7 @@ public class AdjacencyMatrix implements Representation {
              	   adjacencyMatrix[Integer.parseInt(fromToValue[0])][Integer.parseInt(fromToValue[1])] = Integer.parseInt(fromToValue[2]);
              	   
                 }
-                 //System.out.println(line);
-                
-             });
+            });
          } catch (IOException e) {
              e.printStackTrace();
          }
@@ -78,22 +76,11 @@ public class AdjacencyMatrix implements Representation {
     @Override
     public boolean addNode(Node x) {
     	if(getNodeIndexByData((int) x.getData()) == null){
-    		// adding a node in nodes array
     		Node[] temp = nodes;
     		nodes = Arrays.copyOf(temp, nodes.length + 1);
     		nodes[nodes.length - 1] = new Node((int) x.getData());
-    		
-    		// adding a row in adjacency matrix
-//    		int[][] tempAdjacency = new int[adjacencyMatrix.length][adjacencyMatrix.length];
-//    		for (int i = 0; i < tempAdjacency.length;i ++){
-//    			for (int j = 0; i < tempAdjacency.length; ++){
-//    				tempAdjacency[i][j] =  
-//    			}
-//    		}
     		int[][] tempAdjacency = Arrays.copyOf(adjacencyMatrix, adjacencyMatrix.length + 1); 
-
     		tempAdjacency[adjacencyMatrix.length] = new int[adjacencyMatrix.length]; 
-
     		for (int i = 0; i < adjacencyMatrix.length; i++) {
     			tempAdjacency[adjacencyMatrix.length][i] = 0;
     		}
@@ -106,7 +93,6 @@ public class AdjacencyMatrix implements Representation {
 			}
     		adjacencyMatrix = new int[adjacencyMatrix.length + 1][adjacencyMatrix.length + 1];
     		adjacencyMatrix = finaltemp;
-    		
     		return true;
 		}
     	return false;
@@ -130,7 +116,6 @@ public class AdjacencyMatrix implements Representation {
         		int iCount = 0;
         		int iCountNew = 0;
         		for(int[] i :adjacencyMatrix){
-        			
         			int jCount = 0;
         			int jCountNew = 0;
         			for(int j: i){
@@ -139,7 +124,6 @@ public class AdjacencyMatrix implements Representation {
         				jCountNew += 1;
         				}
         				jCount += 1;
-        				//System.out.println(i + " + " + j);
         			}
         			iCount += 1;
         			if(iCount != (int) x.getData() && jCount != (int) x.getData()){
