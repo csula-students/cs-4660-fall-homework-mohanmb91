@@ -167,6 +167,12 @@ public class AdjacencyList implements Representation {
 
     @Override
     public int distance(Node from, Node to) {
+    	Collection<Edge> edges = adjacencyList.get(from);
+    	for(Edge eachEdge : edges){
+    		if(eachEdge.getTo().getData() == to.getData()){
+    			return eachEdge.getValue();
+    		}
+    	}
         return 0;
     }
 
