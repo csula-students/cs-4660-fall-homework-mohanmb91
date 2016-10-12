@@ -33,7 +33,6 @@ public class DFS implements SearchStrategy {
     public List<Edge> search(Graph graph, Node source, Node dist) {
     	dfs(graph,source,dist);
     	parents.put(source,null);
-    	System.out.println("done");
     	Stack<Edge> edges = new Stack<>();
     	Edge currentEdge = parents.get(dist);
     	while(currentEdge != null){
@@ -52,7 +51,6 @@ public class DFS implements SearchStrategy {
 	private void dfs(Graph graph, Node source, Node dist) {
 		frontier.push(source);
 		exploredNodes.add(source);
-		System.out.println(source);
 		boolean hasLegitNeibhours = false;
 		if(!frontier.empty()){
 		for(Node eachNode : graph.neighbors(source)){
@@ -75,50 +73,7 @@ public class DFS implements SearchStrategy {
 			if(!nodeFound){
 				parents.remove(poppedNode);	
 			}
-			
-			//System.out.println("Node popped cause of no legit neibhour"+frontier.pop());
 		}
 	}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//frontier.push(source);
-//exploredNodes.add(source);
-//System.out.println(source);
-////while(!frontier.isEmpty()){
-//while(!exitRecursion || frontier.empty()){
-//	boolean isNodesVisited = true;
-//for(Node eachNode : graph.neighbors(source)){
-//	if(!exploredNodes.contains(eachNode)){
-//		parents.put(eachNode, new Edge(source, eachNode, graph.distance(source, eachNode)));
-//		if(eachNode.getData() == dist.getData()){
-//			exitRecursion = true;
-//			break;
-//		}
-//		if(!exitRecursion){
-//			dfs(graph, eachNode, dist);	
-//		}
-//		isNodesVisited = false;
-//	}
-//}
-//if(isNodesVisited){
-//	if(!frontier.empty())
-//		System.out.println(frontier.pop());
-//}
-//}

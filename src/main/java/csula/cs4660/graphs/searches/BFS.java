@@ -27,14 +27,12 @@ public class BFS implements SearchStrategy {
     	frontier.add(source);
     	exploredSet.add(source);
     	parents.put(source,null);
-    	System.out.println(source.getData().toString());
     	while(!frontier.isEmpty()){
     		Node firstNodeFromQueue = frontier.poll();
     		for(Node eachNeibhour : graph.neighbors(firstNodeFromQueue)){
     			if(!exploredSet.contains(eachNeibhour)){
     				parents.put(eachNeibhour, new Edge(firstNodeFromQueue, eachNeibhour, graph.distance(firstNodeFromQueue, eachNeibhour)));
     				exploredSet.add(eachNeibhour);
-    				System.out.println(eachNeibhour.getData().toString());
     				frontier.add(eachNeibhour);
     			}
     		}
