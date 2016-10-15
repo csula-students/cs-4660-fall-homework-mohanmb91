@@ -21,7 +21,6 @@ public class Parser {
 	static List<Tile> tiles = new ArrayList<Tile>();
     public static Graph readRectangularGridFile(Representation.STRATEGY graphRepresentation, File file) {
         Graph graph = new Graph(Representation.of(graphRepresentation));
-        // TODO: implement the rectangular file read and add node with edges to graph
         Scanner scan;
         
     	try {
@@ -34,9 +33,9 @@ public class Parser {
 			    		coloumn = 0;
 			    	for(int i = 0; i < nextLine.length() - 2; i++){
 			    		if(nextLine.charAt(i) != '|'){
-			    		Tile temp = new Tile(row,coloumn,nextLine.charAt(i)+""+nextLine.charAt(i+1));
+			    		Tile temp = new Tile(coloumn,row,nextLine.charAt(i)+""+nextLine.charAt(i+1));
 			    		tiles.add(temp);
-			    		graph.addNode(new Node(temp.getX() + temp.getY() + temp.getType()));
+			    		graph.addNode(new Node<>(temp));
 			    		i += 1;
 			    		coloumn += 1;
 			    		}
@@ -50,7 +49,7 @@ public class Parser {
 			    	for(char direction : directions){
 			    		Tile temp = tileHasNeibhour(eachTile,direction);
 			    		if(temp != null){
-			    			graph.addEdge(new Edge(new Node(eachTile.getX()+ eachTile.getY() + eachTile.getType()), new Node(temp.getX() + temp.getY() + temp.getType()), 1));
+			    			graph.addEdge(new Edge(new Node<>(eachTile), new Node<>(temp), 1));
 			    		}
 			    	}
 			    }

@@ -52,15 +52,15 @@ public class AStarTest {
             file
         );
 
-        graphs[1] = Parser.readRectangularGridFile(
-            Representation.STRATEGY.ADJACENCY_MATRIX,
-            file
-        );
-
-        graphs[2] = Parser.readRectangularGridFile(
-            Representation.STRATEGY.OBJECT_ORIENTED,
-            file
-        );
+//        graphs[1] = Parser.readRectangularGridFile(
+//            Representation.STRATEGY.ADJACENCY_MATRIX,
+//            file
+//        );
+//
+//        graphs[2] = Parser.readRectangularGridFile(
+//            Representation.STRATEGY.OBJECT_ORIENTED,
+//            file
+//        );
 
         return graphs;
     }
