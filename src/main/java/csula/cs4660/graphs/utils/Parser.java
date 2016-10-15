@@ -36,6 +36,7 @@ public class Parser {
 			    		if(nextLine.charAt(i) != '|'){
 			    		Tile temp = new Tile(row,coloumn,nextLine.charAt(i)+""+nextLine.charAt(i+1));
 			    		tiles.add(temp);
+			    		graph.addNode(new Node(temp.getX() + temp.getY() + temp.getType()));
 			    		i += 1;
 			    		coloumn += 1;
 			    		}
@@ -49,7 +50,7 @@ public class Parser {
 			    	for(char direction : directions){
 			    		Tile temp = tileHasNeibhour(eachTile,direction);
 			    		if(temp != null){
-			    			graph.addEdge(new Edge(new Node(eachTile.getType()), new Node(temp.getType()), 1));
+			    			graph.addEdge(new Edge(new Node(eachTile.getX()+ eachTile.getY() + eachTile.getType()), new Node(temp.getX() + temp.getY() + temp.getType()), 1));
 			    		}
 			    	}
 			    }
