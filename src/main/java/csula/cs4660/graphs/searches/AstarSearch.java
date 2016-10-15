@@ -11,9 +11,9 @@ import java.util.List;
  */
 public class AstarSearch implements SearchStrategy {
 
-    @Override
-    public List<Edge> search(Graph graph, Node source, Node dist) {
-    	System.out.println("enter");
-        return null;
-    }
+	@Override
+	public List<Edge> search(Graph graph, Node source, Node dist) {
+		System.out.println("enter");
+		return null;
+	}
 }
