@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.ArrayUtils;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * Adjacency matrix in a sense store the nodes in two dimensional array
@@ -47,11 +49,16 @@ public class AdjacencyMatrix implements Representation {
     }
 
     public AdjacencyMatrix() {
+    	adjacencyMatrix = new int[0][0];
+    	nodes = new Node[0];
     }
 
     @Override
     public boolean adjacent(Node x, Node y) {
-        return (adjacencyMatrix[(int) x.getData()][(int) y.getData()] > 0);
+    	if(ArrayUtils.indexOf(nodes, x) >=0 && ArrayUtils.indexOf(nodes, x) >= 0){
+    		return (adjacencyMatrix[ ArrayUtils.indexOf(nodes, x)][ArrayUtils.indexOf(nodes, y)] > 0);	
+    	}
+        return false;
     }
 
     @Override
@@ -59,7 +66,7 @@ public class AdjacencyMatrix implements Representation {
     	int coloumn = 0;
     	int nodeIndex = -1;
     	for(int i = 0; i < nodes.length; i ++ ){
-    		if ((int) nodes[i].getData() == (int) x.getData()){
+    		if (nodes[i].getData().equals(x.getData())){
     			nodeIndex = i;
     		}
     	}
@@ -75,10 +82,10 @@ public class AdjacencyMatrix implements Representation {
 
     @Override
     public boolean addNode(Node x) {
-    	if(getNodeIndexByData((int) x.getData()) == null){
+    	if(ArrayUtils.indexOf(nodes, x) == -1){
     		Node[] temp = nodes;
     		nodes = Arrays.copyOf(temp, nodes.length + 1);
-    		nodes[nodes.length - 1] = new Node((int) x.getData());
+    		nodes[nodes.length - 1] = new Node(x.getData());
     		int[][] tempAdjacency = Arrays.copyOf(adjacencyMatrix, adjacencyMatrix.length + 1); 
     		tempAdjacency[adjacencyMatrix.length] = new int[adjacencyMatrix.length]; 
     		for (int i = 0; i < adjacencyMatrix.length; i++) {
@@ -102,7 +109,7 @@ public class AdjacencyMatrix implements Representation {
     public boolean removeNode(Node x) {
     	try{
     		for(int i = 0; i < nodes.length; i ++){
-    			if(nodes[i].getData() == x.getData()){
+    			if(nodes[i].equals(x)){
     				for(int j = i; j < nodes.length -1 ; j ++){
     					nodes[j] = nodes[j+1];
     				}
@@ -143,8 +150,10 @@ public class AdjacencyMatrix implements Representation {
     @Override
     public boolean addEdge(Edge x) {
     	try{
-    	if(adjacencyMatrix[(int) x.getFrom().getData()][(int) x.getTo().getData()] == 0){
-    		adjacencyMatrix[(int) x.getFrom().getData()][(int) x.getTo().getData()] = x.getValue();
+    	Node from = x.getFrom();
+    	Node to = x.getTo();
+    	if(adjacencyMatrix[ArrayUtils.indexOf(nodes, x.getFrom())][ArrayUtils.indexOf(nodes, x.getTo())] == 0){
+    		adjacencyMatrix[ArrayUtils.indexOf(nodes, x.getFrom())][ArrayUtils.indexOf(nodes, x.getTo())] = x.getValue();
     		return true;
     	}
     	}catch(IndexOutOfBoundsException e){

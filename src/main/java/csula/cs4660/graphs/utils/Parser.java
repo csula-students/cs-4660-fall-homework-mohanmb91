@@ -6,90 +6,143 @@ import csula.cs4660.graphs.Graph;
 import csula.cs4660.graphs.Node;
 import csula.cs4660.graphs.representations.Representation;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
-
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * A quick parser class to read different format of files
  */
 public class Parser {
-	static List<Tile> tiles = new ArrayList<Tile>();
-    public static Graph readRectangularGridFile(Representation.STRATEGY graphRepresentation, File file) {
-        Graph graph = new Graph(Representation.of(graphRepresentation));
-        Scanner scan;
-        
-    	try {
-    		scan = new Scanner(file);
-    		int row = 0;
-    		int coloumn =0;
-			    while (scan.hasNextLine()) {
-			    	String nextLine = scan.nextLine();
-			    	if(!nextLine.contains("+") ){
-			    		coloumn = 0;
-			    	for(int i = 0; i < nextLine.length() - 2; i++){
-			    		if(nextLine.charAt(i) != '|'){
-			    		Tile temp = new Tile(coloumn,row,nextLine.charAt(i)+""+nextLine.charAt(i+1));
-			    		tiles.add(temp);
-			    		graph.addNode(new Node<>(temp));
-			    		i += 1;
-			    		coloumn += 1;
-			    		}
-			    	}
-			    	row += 1;
-			    	}
-			    }
-			    List<Character> directions = new ArrayList<Character>(); 
-			    directions.add('N');directions.add('E');directions.add('S');directions.add('W');
-			    for(Tile eachTile : tiles){
-			    	for(char direction : directions){
-			    		Tile temp = tileHasNeibhour(eachTile,direction);
-			    		if(temp != null){
-			    			graph.addEdge(new Edge(new Node<>(eachTile), new Node<>(temp), 1));
-			    		}
-			    	}
-			    }
-			    }
-    	catch(Exception e){
-    		
-    	}
-        return graph;
-    }
+	static Map <PointXY,Tile> tileMap = new HashMap<PointXY,Tile>();
 
-    private static Tile tileHasNeibhour(Tile eachTile, char direction) {
-    	Tile tile = null;
-    	switch(direction){
-    	case 'N':
-    		tile = getTile(eachTile,eachTile.getX(),eachTile.getY() - 1);
-    		break;
-    	case 'E':
-    		tile = getTile(eachTile,eachTile.getX() + 1,eachTile.getY());
-    		break;
-    	case 'S':
-    		tile = getTile(eachTile,eachTile.getX(),eachTile.getY() + 1);
-    		break;
-    	case 'W':
-    		tile = getTile(eachTile,eachTile.getX() - 1,eachTile.getY());
-    		break;
-    	}
-		return tile;
-	}
-
-	private static Tile getTile(Tile eachTile, int x, int y) {
-		for(Tile tile : tiles){
-			if(tile.getX() == x && tile.getY() == y){
-				return tile;
-			}
+	public static Graph readRectangularGridFile(Representation.STRATEGY graphRepresentation, File file) {		Graph graph = new Graph(Representation.of(graphRepresentation));
+	// TODO: implement the rectangular file read and add node with edges to graph
+	BufferedReader buffer;
+	int row = 0;
+	int value =0;
+	int column = 0;
+	String stringValue;
+	int counter;
+	List<String> lines = new ArrayList<String>();
+	try {
+		buffer = new BufferedReader(new FileReader(file));
+		String eachLine ;
+		while ((eachLine = buffer.readLine()) != null) {
+			lines.add(eachLine.substring(1, eachLine.length() - 1));				
 		}
-		return null;
+		lines.remove(lines.size()-1);
+		lines.remove(0);
 	}
+	catch (FileNotFoundException e) {
+		e.printStackTrace();
+	} catch (NumberFormatException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+
+
+	row = lines.size();
+	column  = lines.get(0).length()/2;
+
+
+	//to add the nodes 
+	for(int i = 0;i<row ;i++){
+		counter = 0;
+		for(int j = 0;j<column;j++){
+			stringValue = lines.get(i).substring(counter,counter+2);
+			counter+=2;
+			tileMap.put(new PointXY(j,i),new Tile(j,i,stringValue));
+			graph.addNode(new Node<Tile>(new Tile(j,i,stringValue)));
+		}
+	}
+
+//	//add edges
+	for (Map.Entry<PointXY,Tile> entry : tileMap.entrySet())
+	{
+		pushEdges(graph,entry.getValue(),"N",row,column);
+		pushEdges(graph,entry.getValue(),"S",row,column);
+		pushEdges(graph,entry.getValue(),"E",row,column);
+		pushEdges(graph,entry.getValue(),"W",row,column);
+	}
+
+	return graph;
+	}
+
+	private static void pushEdges(Graph graph,Tile fromTile, String direction,int row,int column) {
+		int x;
+		int y;
+		PointXY newCoord;
+		Tile newTile;
+		switch(direction){
+		case "N" : 
+				x = fromTile.getX();
+				y = fromTile.getY()-1;
+				newCoord = new PointXY(x,y);
+				newTile =(Tile) tileMap.get(newCoord);
+				if(tileMap.containsKey(newCoord)){
+					graph.addEdge(new Edge(new Node<Tile>(fromTile),new Node<Tile>(newTile),1));
+			}
+			break;
+		case "S" : 
+				x = fromTile.getX();
+				y = fromTile.getY()+1;
+				newCoord = new PointXY(x,y);
+				newTile =(Tile) tileMap.get(newCoord);
+				if(tileMap.containsKey(newCoord)){
+					graph.addEdge(new Edge(new Node<Tile>(fromTile),new Node<Tile>(newTile),1));
+			}
+
+			break;
+		case "E" : 
+			
+				x = fromTile.getX()+1;
+				y = fromTile.getY();
+				newCoord = new PointXY(x,y);
+				newTile = tileMap.get(newCoord);		
+				if(tileMap.containsKey(newCoord)){
+					graph.addEdge(new Edge(new Node<Tile>(fromTile),new Node<Tile>(newTile),1));
+			}
+
+			break;
+		case "W" : 
+				x = fromTile.getX()-1;
+				y = fromTile.getY();
+				newCoord = new PointXY(x,y);
+				newTile = tileMap.get(newCoord);	
+				if(tileMap.containsKey(newCoord)){
+				graph.addEdge(new Edge(new Node<Tile>(fromTile),new Node<Tile>(newTile),1));
+			}
+			break;
+		
+		}
+
+	}
+
+
 
 	public static String converEdgesToAction(Collection<Edge> edges) {
-        // TODO: convert a list of edges to a list of action
-        return "";
-    }
+		String directions = "";
+		Tile fromTile =null, toTile =null;
+
+		for (Edge eachEdge : edges) {
+			fromTile = (Tile) eachEdge.getFrom().getData();
+			toTile = (Tile) eachEdge.getTo().getData();
+			if (fromTile.getY() > toTile.getY())
+				directions += "N";
+			else if (fromTile.getY() < toTile.getY())
+				directions += "S";
+			else if (fromTile.getX() < toTile.getX())
+				directions += "E";
+			else if (fromTile.getX() > toTile.getX())
+				directions += "W";
+
+		}
+		return directions;
+	}
 }

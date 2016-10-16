@@ -23,7 +23,7 @@ import csula.cs4660.graphs.Node;
 		int getPriotiyOfNode(Node node){
 			QNode currentNode = head;
 			while(currentNode != null){
-				if(currentNode.data.getData() == node.getData()){
+				if(currentNode.data.getData().equals(node.getData())){
 					return currentNode.priority;
 				}
 				currentNode = currentNode.next;
@@ -39,7 +39,7 @@ import csula.cs4660.graphs.Node;
 				}
 				currentNode = currentNode.next;
 			}
-			if(head.data.getData() == node.getData()){
+			if(head.data.getData().equals(node.getData())){
 				head = head.next;
 			}
 		}
@@ -86,16 +86,4 @@ import csula.cs4660.graphs.Node;
 		boolean isEmpty(){
 			return head == null;
 		}
-//		public static void main (String args[]){
-//			PriorityQueue q = new PriorityQueue();
-//			q.enqueue(new Node(4), 1);
-//			q.enqueue(new Node(3), 2);
-//			q.enqueue(new Node(2), 3);
-//			q.enqueue(new Node(5), 1);
-//			
-//			q.remove(new Node(5));
-//			q.remove(new Node(4));
-//			q.remove(new Node(3));
-//			q.remove(new Node(2));
-//		}
 	}

@@ -9,7 +9,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -19,119 +23,185 @@ import java.util.stream.Stream;
  *
  * TODO: Please fill the body of methods in this class
  */
-public class ObjectOriented implements Representation {
-    private Collection<Node> nodes;
+public class ObjectOriented implements Representation {  
+	private Collection<Node> nodes;
     private Collection<Edge> edges;
+    
+	private Map<Node, Collection<Edge>> nodeEdges;
 
-    public ObjectOriented(File file) {
-    nodes = new ArrayList<Node>();
-    edges = new ArrayList<Edge>();
-   	 try (Stream<String> stream = Files.lines(file.toPath())) {
-            stream.forEach(line -> {
-               if(line.split(":").length == 1){
-               	
-            	   int totalNoOfNodes = Integer.parseInt(line);
-            	   for (int i = 0; i < totalNoOfNodes; i++) {
-					nodes.add(new Node(i));   
-				}
-            	   
-            	   
-               }
-               else{
-            	   String[] fromToValue = line.split(":");
-            	   edges.add(new Edge(new Node(Integer.parseInt(fromToValue[0])),new Node(Integer.parseInt(fromToValue[1])),Integer.parseInt(fromToValue[2])));
-               }
-                //System.out.println(line);
-               
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	public ObjectOriented(File file) {
+		nodes = new LinkedHashSet<Node>();
+	    edges = new LinkedHashSet<Edge>();
+		nodeEdges= new HashMap<Node,Collection<Edge>>();
+	 try (Stream<String> stream = Files.lines(file.toPath())) {
+         stream.forEach(line -> {
+            if(line.split(":").length == 1){
+            	
+         	   int totalNoOfNodes = Integer.parseInt(line);
+         	   for (int i = 0; i < totalNoOfNodes; i++) {
+         		   nodeEdges.put(new Node(i),new ArrayList<Edge>());
+				   
+			}
+         	   
+         	   
+            }
+            else{
+         	   String[] fromToValue = line.split(":");
+         	  Node fromNode = getNodeIndexByData(Integer.parseInt(fromToValue[0]));
+         	  Node toNode = getNodeIndexByData(Integer.parseInt(fromToValue[1]));
+         	  int value = Integer.parseInt(fromToValue[2]);
+         	  Edge edge = new Edge(fromNode,toNode,value);
+         	  if(nodeEdges.containsKey(fromNode)){
+         		  Collection<Edge> edges = nodeEdges.get(fromNode);
+         		  
+         		 edges.add(edge);
+         		 nodeEdges.put(fromNode, edges);
+         	  }
+            }
+         });
+     } catch (IOException e) {
+         e.printStackTrace();
+     }
+}
 
-    public ObjectOriented() {
+protected ObjectOriented() {
+	nodes = new LinkedHashSet<Node>();
+    edges = new LinkedHashSet<Edge>();
+	nodeEdges= new HashMap<Node,Collection<Edge>>();
+}
 
-    }
+@Override
+public boolean adjacent(Node x, Node y) {
+	if(nodeEdges.containsKey(x)){
+		  Collection<Edge> edges = nodeEdges.get(x);
+		  for(Edge eachEdge: edges){
+			  if(eachEdge.getTo().getData().equals(y.getData()) ){
+				  return true;
+			  }
+		  }
+	  }
+    return false;
+}
 
-    @Override
-    public boolean adjacent(Node x, Node y) {
-    	for (Edge edge : edges) {
-			if(edge.getFrom().getData().equals(x.getData()) &&
-				edge.getTo().getData().equals(y.getData())){
-				return true;
-				
+@Override
+public List<Node> neighbors(Node x) {
+	List<Node> neighborsNodes = new ArrayList<>();
+	if(nodeEdges.containsKey(x)){
+		  Collection<Edge> edges = nodeEdges.get(x);
+		  for(Edge eachEdge: edges){
+			  neighborsNodes.add(eachEdge.getTo());
+		  }
+		  return neighborsNodes;
+	  }
+    return neighborsNodes;
+}
+
+@Override
+public boolean addNode(Node x) {
+	if(!nodes.contains(x)){
+		nodes.add(x);	
+	}
+	
+	if(!nodeEdges.containsKey(x)){
+		  nodeEdges.put(x,new ArrayList<Edge>());
+		  return true;
+	  }
+    return false;
+}
+
+@Override
+public boolean removeNode(Node x) {
+	if(!nodes.contains(x)){
+		nodes.remove(x);	
+	}
+	if(nodeEdges.containsKey(x)){
+		  nodeEdges.remove(x);
+		for(Map.Entry<Node, Collection<Edge>> entry : nodeEdges.entrySet()) {
+		Node key = entry.getKey();
+		Collection<Edge> value = entry.getValue();
+		for (Iterator iterator = value.iterator(); iterator.hasNext();) {
+			Edge edge = (Edge) iterator.next();
+			if(edge.getTo().equals(x)){
+				iterator.remove();
+
 			}
 		}
-        return false;
-    }
+		nodeEdges.put(key, value);
+		}
+		  return true;
+	  }
+    return false;
+}
 
-    @Override
-    public List<Node> neighbors(Node x) {
-    	List<Node> expectedlist= new ArrayList<Node>();
-    	for (Edge edge : edges) {
-			if(edge.getFrom().getData().equals(x.getData())){
-				expectedlist.add(new Node(edge.getTo().getData()));
-				
+@Override
+public boolean addEdge(Edge x) {
+	Node from = x.getFrom();
+	Node to = x.getTo();
+	if(nodeEdges.containsKey(from) && nodeEdges.containsKey(to)){
+		Collection<Edge> tempEdges = nodeEdges.get(from);
+		for(Edge eachEdge : tempEdges){
+			if(eachEdge.equals(x)){
+				return false;
 			}
 		}
-        return expectedlist;
-    }
+		edges.add(x);
+		tempEdges.add(x);
+		nodeEdges.put(from, tempEdges);
+		return true;
+	}
+    return false;
+}
 
-    @Override
-    public boolean addNode(Node x) {
-    	if(!nodes.contains(x)){
-    		nodes.add(x);
-    		return true;
-    	}
-        return false;
-    }
-
-    @Override
-    public boolean removeNode(Node x) {
-    	if(nodes.contains(x)){
-    		nodes.remove(x);
-    		Collection<Edge> newEdge = new ArrayList<Edge>();
-    		for (Edge edge : edges) {
-				if(!edge.getTo().getData().equals(x.getData())){
-					newEdge.add(edge);
-				}
+@Override
+public boolean removeEdge(Edge x) {
+	Node from = x.getFrom();
+	if(nodeEdges.containsKey(from)){
+		Collection<Edge> edges = nodeEdges.get(from);
+		if(edges == null){
+			return false;
+		}
+		Edge removeEdge = null;
+		boolean edgeFound = false;
+		for(Edge eachEdge : edges){
+			if(eachEdge.getTo().equals(x.getTo())){
+				removeEdge = eachEdge;
+				edgeFound = true;
+				break;
 			}
-    		edges = newEdge;
-    		return true;
-    	}
-        return false;
-    }
+		}
+		if(!edgeFound){
+			return edgeFound;
+		}
+		edges.remove(removeEdge);
+		nodeEdges.put(from,edges);
+		return true;
+	}
+    return false;
+}
 
-    @Override
-    public boolean addEdge(Edge x) {
-    	if(!edges.contains(x)){
-    		edges.add(x);
-    		return true;
-    	}
-        return false;
-    }
+@Override
+public int distance(Node from, Node to) {
+	Collection<Edge> edges = nodeEdges.get(from);
+	for(Edge eachEdge : edges){
+		if(eachEdge.getTo().getData() == to.getData()){
+			return eachEdge.getValue();
+		}
+	}
+    return 0;
+}
 
-    @Override
-    public boolean removeEdge(Edge x) {
-        if(edges.contains(x)){
-        	edges.remove(x);
-        	return true;
-        }
-    	return false;
-    }
+@Override
+public Optional<Node> getNode(int index) {
+    return null;
+}
 
-    @Override
-    public int distance(Node from, Node to) {
-    	for(Edge eachEdge : edges){
-    		if(eachEdge.getFrom().getData() == from.getData() && eachEdge.getTo().getData() == to.getData()){
-    			return eachEdge.getValue();
-    		}
-    	}
-        return 0;
-    }
-
-    @Override
-    public Optional<Node> getNode(int index) {
-        return null;
-    }
+public Node getNodeIndexByData(int data){
+	for (Map.Entry<Node,Collection<Edge>> entry : nodeEdges.entrySet()) {
+		  Node key = entry.getKey();
+		  if((int) key.getData() == (int) data){
+  			return key;
+  			}
+		  }
+	return null;
+}
 }

@@ -52,15 +52,15 @@ public class AStarTest {
             file
         );
 
-//        graphs[1] = Parser.readRectangularGridFile(
-//            Representation.STRATEGY.ADJACENCY_MATRIX,
-//            file
-//        );
-//
-//        graphs[2] = Parser.readRectangularGridFile(
-//            Representation.STRATEGY.OBJECT_ORIENTED,
-//            file
-//        );
+        graphs[1] = Parser.readRectangularGridFile(
+            Representation.STRATEGY.ADJACENCY_MATRIX,
+            file
+        );
+
+        graphs[2] = Parser.readRectangularGridFile(
+            Representation.STRATEGY.OBJECT_ORIENTED,
+            file
+        );
 
         return graphs;
     }
@@ -151,6 +151,7 @@ public class AStarTest {
                         new Node<>(new Tile(3, 0, "@1")),
                         new Node<>(new Tile(13, 0, "@8")))
                 );
+                System.out.println("Astar test case "+result);
                 String expectedOutput = "SSSSEEEEEEEEEEEEENNWNWNW";
                 assertEquals(
                     "Test grid 2 number of S",
