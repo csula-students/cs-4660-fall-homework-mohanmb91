@@ -13,14 +13,15 @@ import java.util.*;
 public class App {
 	static boolean isGoalReached = false;
     public static void main(String[] args) {
-        // to get a state, you can simply call `Client.getState with the id`
         State initialState = Client.getState("10a5461773e8fd60940a56d2e9ef7bf4").get();
         State goal = Client.getState("e577aa79473673f6158cc73e0e5dc122").get();
-        BFS(initialState); //BFS implementation
+        System.out.println("BFS Path:");
         System.out.println();
-        System.out.println("Dijkstra's"); 
+        BFS(initialState,goal); //BFS implementation
         System.out.println();
-        Dijikstra(initialState,goal);
+        System.out.println("Dijkstra's path"); 
+        System.out.println();
+        Dijikstra(initialState,goal);   //Dijikstra implementation
     }
 
     private static void Dijikstra(State initialState, State goal) {
@@ -58,18 +59,16 @@ public class App {
 		
 	}
 
-	private static void BFS(State initialState) {
+	private static void BFS(State initialState,State goal) {
 
         Queue<State> frontier = new LinkedList<>();
         Set<State> exploredSet = new HashSet<>();
         Map<State, State> parents = new HashMap<>();
         frontier.add(initialState);
-        System.out.println("BFS Path:");
-        System.out.println();
         while (!frontier.isEmpty()) {
             State current = frontier.poll();
             exploredSet.add(current);
-            if (current.getId().equals("e577aa79473673f6158cc73e0e5dc122")) {
+            if (current.equals(goal)){
                 // construct actions from endTile
             	//parents.put(neighbor, current);
                 findDepth(parents, current, initialState);
@@ -103,7 +102,7 @@ public class App {
         Optional<DTO> stateTranscition;
         while (!c.equals(start)) {
         	stateTranscition = Client.stateTransition(parents.get(c).getId(),c.getId() );
-        	stack.push(parents.get(c).getLocation().getName() +" : "+c.getLocation().getName() + " : " +stateTranscition.get().getEvent().getEffect() );
+        	stack.push(parents.get(c).getLocation().getName() +" : "+c.getLocation().getName()+ " : " +stateTranscition.get().getEvent().getEffect() );
             depth ++;
             c = parents.get(c);
         }

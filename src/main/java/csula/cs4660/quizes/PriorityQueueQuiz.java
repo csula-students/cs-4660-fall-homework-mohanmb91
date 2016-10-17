@@ -87,21 +87,5 @@ public class PriorityQueueQuiz{
 	boolean isEmpty(){
 		return head == null;
 	}
-	
-	
-	//test Case for highest value first priority queue
-//	public static void main (String args[]){
-//		PriorityQueueQuiz queuy = new PriorityQueueQuiz();
-//		queuy.enqueue(new State("abc"), -30);    //5
-//		queuy.enqueue(new State("abd"), 0);      //3
-//		queuy.enqueue(new State("abe"), -3);     //4 
-//		queuy.enqueue(new State("abf"), 20);     //1
-//		queuy.enqueue(new State("abg"), 0);      //2
-//		System.out.println(queuy.dequeue());
-//		System.out.println(queuy.dequeue());
-//		System.out.println(queuy.dequeue());
-//		System.out.println(queuy.dequeue());
-//		System.out.println(queuy.dequeue());
-//	}
 }
 
