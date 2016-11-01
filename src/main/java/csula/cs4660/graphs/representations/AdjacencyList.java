@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * Adjacency list is probably the most common implementation to store the unknown
@@ -188,5 +189,18 @@ public class AdjacencyList implements Representation {
       			}
     		  }
     	return null;
+    }
+
+    @Override
+    public Optional<Node> getNode(Node node) {
+        Iterator<Node> iterator = adjacencyList.keySet().iterator();
+        Optional<Node> result = Optional.empty();
+        while (iterator.hasNext()) {
+            Node next = iterator.next();
+            if (next.equals(node)) {
+                result = Optional.of(next);
+            }
+        }
+        return result;
     }
 }
