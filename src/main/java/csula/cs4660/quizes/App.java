@@ -25,6 +25,7 @@ public class App {
     }
 
     private static void Dijikstra(State initialState, State goal) {
+    	//Queue obj = new LinkedList<>();
     	PriorityQueueQuiz frontier = new PriorityQueueQuiz();
         Set<State> exploredSet = new HashSet<>();
         Map<State, State> parents = new HashMap<>();
@@ -102,7 +103,7 @@ public class App {
         Optional<DTO> stateTranscition;
         while (!c.equals(start)) {
         	stateTranscition = Client.stateTransition(parents.get(c).getId(),c.getId() );
-        	stack.push(parents.get(c).getLocation().getName() +" : "+c.getLocation().getName()+ " : " +stateTranscition.get().getEvent().getEffect() );
+        	stack.push(parents.get(c).getLocation().getName() +"   "+parents.get(c).getId()+" : "+c.getLocation().getName()+ " : " +c.getId()+"    "+stateTranscition.get().getEvent().getEffect() );
             depth ++;
             c = parents.get(c);
         }
