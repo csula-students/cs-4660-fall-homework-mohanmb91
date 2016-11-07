@@ -43,8 +43,8 @@ Following terminologies will be focus on the environment types:
 * Discrete vs continuous
   * Number of states in games is countable (discrete) and not-countable (continuous)
 * Benign vs adversarial
-  * Environment goes against you (benign) like Chess (environment -- your opponent -- is trying to defeat you)
-  * Or environment is just there (like weather effect for selv-driving car)
+  * Environment goes against you (adversarial) like Chess (environment -- your opponent -- is trying to defeat you)
+  * Or environment is just there (like weather effect for selv-driving car)(benign)
 
 ### Summary
 
@@ -71,7 +71,7 @@ And follow the note to set up Git/Github -- https://github.com/csula/Utilities/b
 
 ## Wrap Up Java Review Exercise
 
-Once you set up the above two dependencies, please do this wrap up exercise to
+Once you set up the above two dependencies, please  do this wrap up exercise to
 test your local environment setup!
 
 Since not everyone has experience of using Github/git before, we will go over
