@@ -21,10 +21,10 @@ import java.util.stream.Stream;
  * TODO: please implement the method body
  */
 public class AdjacencyList implements Representation {
-    private Map<Node, Collection<Edge>> adjacencyList;
+    private Map<Node, Collection<Edge>> adjacencyList= new HashMap<Node,Collection<Edge>>();
 
     public AdjacencyList(File file) {
-    	adjacencyList = new HashMap<Node,Collection<Edge>>();
+    	 
     	 try (Stream<String> stream = Files.lines(file.toPath())) {
              stream.forEach(line -> {
                 if(line.split(":").length == 1){
@@ -55,19 +55,18 @@ public class AdjacencyList implements Representation {
          } catch (IOException e) {
              e.printStackTrace();
          }
-    }
+ }
 
-    public AdjacencyList() {
+    protected AdjacencyList() {
 
     }
 
     @Override
     public boolean adjacent(Node x, Node y) {
-    	Node from = getNodeIndexByData((int) x.getData());
-    	if(adjacencyList.containsKey(from)){
-   		  Collection<Edge> edges = adjacencyList.get(from);
+    	if(adjacencyList.containsKey(x)){
+   		  Collection<Edge> edges = adjacencyList.get(x);
    		  for(Edge eachEdge: edges){
-   			  if(eachEdge.getTo().getData() == y.getData() ){
+   			  if(eachEdge.getTo().getData().equals(y.getData()) ){
    				  return true;
    			  }
    		  }
@@ -78,15 +77,14 @@ public class AdjacencyList implements Representation {
     @Override
     public List<Node> neighbors(Node x) {
     	List<Node> neighborsNodes = new ArrayList<>();
-    	Node from = getNodeIndexByData((int) x.getData());
-    	if(adjacencyList.containsKey(from)){
-   		  Collection<Edge> edges = adjacencyList.get(from);
+    	if(adjacencyList.containsKey(x)){
+   		  Collection<Edge> edges = adjacencyList.get(x);
    		  for(Edge eachEdge: edges){
    			  neighborsNodes.add(eachEdge.getTo());
    		  }
    		  return neighborsNodes;
    	  }
-        return null;
+        return neighborsNodes;
     }
 
     @Override
@@ -108,7 +106,7 @@ public class AdjacencyList implements Representation {
 			Collection<Edge> value = entry.getValue();
 			for (Iterator iterator = value.iterator(); iterator.hasNext();) {
 				Edge edge = (Edge) iterator.next();
-				if(edge.getTo().getData().equals(x.getData())){
+				if(edge.getTo().equals(x)){
 					iterator.remove();
 
 				}
@@ -127,7 +125,8 @@ public class AdjacencyList implements Representation {
     	if(adjacencyList.containsKey(from) && adjacencyList.containsKey(to)){
     		Collection<Edge> edges = adjacencyList.get(from);
     		for(Edge eachEdge : edges){
-    			if(eachEdge.getTo().getData() == x.getTo().getData()){
+    			//if(eachEdge.getTo().getData() == x.getTo().getData()){
+    			if(eachEdge.equals(x)){
     				return false;
     			}
     		}
@@ -149,7 +148,7 @@ public class AdjacencyList implements Representation {
     		Edge removeEdge = null;
     		boolean edgeFound = false;
     		for(Edge eachEdge : edges){
-    			if((int) eachEdge.getTo().getData() == (int) x.getTo().getData()){
+    			if(eachEdge.getTo().equals(x.getTo())){
     				removeEdge = eachEdge;
     				edgeFound = true;
     				break;
@@ -167,6 +166,12 @@ public class AdjacencyList implements Representation {
 
     @Override
     public int distance(Node from, Node to) {
+    	Collection<Edge> edges = adjacencyList.get(from);
+    	for(Edge eachEdge : edges){
+    		if(eachEdge.getTo().getData() == to.getData()){
+    			return eachEdge.getValue();
+    		}
+    	}
         return 0;
     }
 
