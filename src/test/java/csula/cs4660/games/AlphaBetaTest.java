@@ -15,49 +15,50 @@ public class AlphaBetaTest {
 
     @Before
     public void setUp() throws Exception {
-        for (int i = 0; i < 15; i ++) {
-            graph.addNode(new Node<>(new MiniMaxState(i, 0)));
-        }
-        graph.addNode(new Node<>(new MiniMaxState(15, 8)));
-        graph.addNode(new Node<>(new MiniMaxState(16, -8)));
-        graph.addNode(new Node<>(new MiniMaxState(17, 4)));
-        graph.addNode(new Node<>(new MiniMaxState(18, -9)));
-        graph.addNode(new Node<>(new MiniMaxState(19, -15)));
-        graph.addNode(new Node<>(new MiniMaxState(20, 9)));
-        graph.addNode(new Node<>(new MiniMaxState(21, -9)));
-        graph.addNode(new Node<>(new MiniMaxState(22, -13)));
-        graph.addNode(new Node<>(new MiniMaxState(23, -14)));
-        graph.addNode(new Node<>(new MiniMaxState(24, -16)));
-        graph.addNode(new Node<>(new MiniMaxState(25, -14)));
-        graph.addNode(new Node<>(new MiniMaxState(26, -15)));
-        graph.addNode(new Node<>(new MiniMaxState(27, 9)));
-        graph.addNode(new Node<>(new MiniMaxState(28, 3)));
-        graph.addNode(new Node<>(new MiniMaxState(29, 6)));
-        graph.addNode(new Node<>(new MiniMaxState(30, 14)));
 
-        int diff = 1;
-        for (int i = 0; i < 7; i ++ ) {
-            graph.addEdge(new Edge(new Node<>(new MiniMaxState(i, 0)), new Node<>(new MiniMaxState(i+diff, 0)), 1));
-            diff ++;
-            graph.addEdge(new Edge(new Node<>(new MiniMaxState(i, 0)), new Node<>(new MiniMaxState(i+diff, 0)), 1));
-        }
+    	        for (int i = 0; i < 15; i ++) {
+    	            graph.addNode(new Node<>(new MiniMaxState(i, 0)));
+    	        }
+    	        graph.addNode(new Node<>(new MiniMaxState(15, 8)));
+    	        graph.addNode(new Node<>(new MiniMaxState(16, -8)));
+    	        graph.addNode(new Node<>(new MiniMaxState(17, 4)));
+    	        graph.addNode(new Node<>(new MiniMaxState(18, -9)));
+    	        graph.addNode(new Node<>(new MiniMaxState(19, -15)));
+    	        graph.addNode(new Node<>(new MiniMaxState(20, 9)));
+    	        graph.addNode(new Node<>(new MiniMaxState(21, -9)));
+    	        graph.addNode(new Node<>(new MiniMaxState(22, -13)));
+    	        graph.addNode(new Node<>(new MiniMaxState(23, -14)));
+    	        graph.addNode(new Node<>(new MiniMaxState(24, -16)));
+    	        graph.addNode(new Node<>(new MiniMaxState(25, -14)));
+    	        graph.addNode(new Node<>(new MiniMaxState(26, -15)));
+    	        graph.addNode(new Node<>(new MiniMaxState(27, 9)));
+    	        graph.addNode(new Node<>(new MiniMaxState(28, 3)));
+    	        graph.addNode(new Node<>(new MiniMaxState(29, 6)));
+    	        graph.addNode(new Node<>(new MiniMaxState(30, 14)));
 
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(7, 0)), new Node<>(new MiniMaxState(15, 8)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(7, 0)), new Node<>(new MiniMaxState(16, -8)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(8, 0)), new Node<>(new MiniMaxState(17, 4)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(8, 0)), new Node<>(new MiniMaxState(18, -9)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(9, 0)), new Node<>(new MiniMaxState(19, -15)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(9, 0)), new Node<>(new MiniMaxState(20, 9)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(10, 0)), new Node<>(new MiniMaxState(21, -9)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(10, 0)), new Node<>(new MiniMaxState(22, -13)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(11, 0)), new Node<>(new MiniMaxState(23, -14)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(11, 0)), new Node<>(new MiniMaxState(24, -16)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(12, 0)), new Node<>(new MiniMaxState(25, -14)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(12, 0)), new Node<>(new MiniMaxState(26, -15)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(13, 0)), new Node<>(new MiniMaxState(27, 9)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(13, 0)), new Node<>(new MiniMaxState(28, 3)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(14, 0)), new Node<>(new MiniMaxState(29, 6)), 1));
-        graph.addEdge(new Edge(new Node<>(new MiniMaxState(14, 0)), new Node<>(new MiniMaxState(30, 14)), 1));
+    	        int diff = 1;
+    	        for (int i = 0; i < 7; i ++ ) {
+    	            graph.addEdge(new Edge(new Node<>(new MiniMaxState(i, 0)), new Node<>(new MiniMaxState(i+diff, 0)), 1));
+    	            diff ++;
+    	            graph.addEdge(new Edge(new Node<>(new MiniMaxState(i, 0)), new Node<>(new MiniMaxState(i+diff, 0)), 1));
+    	        }
+
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(7, 0)), new Node<>(new MiniMaxState(15, 8)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(7, 0)), new Node<>(new MiniMaxState(16, -8)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(8, 0)), new Node<>(new MiniMaxState(17, 4)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(8, 0)), new Node<>(new MiniMaxState(18, -9)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(9, 0)), new Node<>(new MiniMaxState(19, -15)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(9, 0)), new Node<>(new MiniMaxState(20, 9)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(10, 0)), new Node<>(new MiniMaxState(21, -9)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(10, 0)), new Node<>(new MiniMaxState(22, -13)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(11, 0)), new Node<>(new MiniMaxState(23, -14)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(11, 0)), new Node<>(new MiniMaxState(24, -16)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(12, 0)), new Node<>(new MiniMaxState(25, -14)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(12, 0)), new Node<>(new MiniMaxState(26, -15)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(13, 0)), new Node<>(new MiniMaxState(27, 9)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(13, 0)), new Node<>(new MiniMaxState(28, 3)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(14, 0)), new Node<>(new MiniMaxState(29, 6)), 1));
+    	        graph.addEdge(new Edge(new Node<>(new MiniMaxState(14, 0)), new Node<>(new MiniMaxState(30, 14)), 1));
     }
 
     @Test

@@ -8,8 +8,9 @@ import csula.cs4660.graphs.Node;
 
 public class MiniMax {
 	static HashMap<Node<MiniMaxState>, Node<MiniMaxState>> parents = new HashMap<>();
+    
+    static Node rootNode = null;
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    static Node rootNode = null; 
 	public static Node getBestMove(Graph graph, Node root, Integer depth, Boolean max) {
     	if(rootNode == null){
     		rootNode = root;
