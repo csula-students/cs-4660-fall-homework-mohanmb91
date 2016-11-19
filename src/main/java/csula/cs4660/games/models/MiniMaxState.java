@@ -4,15 +4,23 @@ package csula.cs4660.games.models;
  * Created by eric on 10/30/16.
  */
 public class MiniMaxState {
-    private final int index;
-    private final int value;
+    private int index;
+    private int value;
 
     public MiniMaxState(int index, int value) {
         this.index = index;
         this.value = value;
     }
 
-    public int getIndex() {
+    public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
+	}
+
+	public int getIndex() {
         return index;
     }
 

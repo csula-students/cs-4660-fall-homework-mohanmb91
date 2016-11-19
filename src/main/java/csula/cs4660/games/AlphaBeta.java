@@ -37,6 +37,7 @@ public class AlphaBeta {
             if(((MiniMaxState) source.getData()).getIndex() != ((MiniMaxState) rootNode.getData()).getIndex()){
             bestValue = new Node(new MiniMaxState( ((MiniMaxState) source.getData()).getIndex() , ((MiniMaxState)bestValue.getData()).getValue() ));
             }
+            ((MiniMaxState) graph.getNode(source).get().getData()).setValue(((MiniMaxState)bestValue.getData()).getValue());
             return bestValue;
         } else {
         	bestValue =new Node<>(new MiniMaxState( Integer.MAX_VALUE, Integer.MAX_VALUE)); // positive infinite
@@ -54,6 +55,7 @@ public class AlphaBeta {
         	  if(((MiniMaxState) source.getData()).getIndex() != ((MiniMaxState) rootNode.getData()).getIndex()){
                   bestValue = new Node(new MiniMaxState( ((MiniMaxState) source.getData()).getIndex() , ((MiniMaxState)bestValue.getData()).getValue() ));
                   }
+        	  ((MiniMaxState) graph.getNode(source).get().getData()).setValue(((MiniMaxState)bestValue.getData()).getValue());
             return bestValue;
         }
        
