@@ -35,9 +35,7 @@ public class AdjacencyList implements Representation {
              		   adjacencyList.put(new Node(i),new ArrayList<Edge>());
 					   
 				}
-             	   
-             	   
-                }
+             	   }
                 else{
              	   String[] fromToValue = line.split(":");
              	  Node fromNode = getNodeIndexByData(Integer.parseInt(fromToValue[0]));
