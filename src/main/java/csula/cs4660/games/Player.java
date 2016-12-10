@@ -990,7 +990,7 @@ class Player {
 	    		}
 	    	
 	    	}
-	    	//debugBoard(currentBoardState);
+	    	//debugBoard(currentBoardState); // pull request change
 	    	return playerCountCellCount - otherPlayersCellCount; 
 		}
 		private static NodeTron compareNodesMin(NodeTron<MiniMaxStateTron> bestValue, NodeTron<MiniMaxStateTron> value) {
