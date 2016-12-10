@@ -594,7 +594,7 @@ class Player {
 //        int level;
 //        if(N > 3){
 //        level = 1;
-//        radius = 15;
+//        radius = 15; pull request change
 //        }else{
 //        	level = 2;
 //        	radius = 100;
