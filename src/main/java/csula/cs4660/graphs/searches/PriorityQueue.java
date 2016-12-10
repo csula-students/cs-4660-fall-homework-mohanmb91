@@ -3,7 +3,7 @@ package csula.cs4660.graphs.searches;
 import csula.cs4660.graphs.Node;
 
 
-	class QNode{
+	 class QNode{
 		QNode next;
 		Node data;
 		int priority;

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -18,8 +19,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Adjacency matrix in a sense store the nodes in two dimensional array
- *
- * TODO: please fill the method body of this class
  */
 public class AdjacencyMatrix implements Representation {
     private Node[] nodes;
@@ -183,7 +182,7 @@ public class AdjacencyMatrix implements Representation {
     public Optional<Node> getNode(int index) {
         return null;
     }
-    
+ 
     public Node getNodeIndexByData(int data){
     	for(int i=0; i < nodes.length; i ++){
     		if((int) nodes[i].getData() == (int) data){
@@ -193,4 +192,17 @@ public class AdjacencyMatrix implements Representation {
     	return null;
     }
     
+
+    @Override
+    public Optional<Node> getNode(Node node) {
+        Iterator<Node> iterator = Arrays.asList(nodes).iterator();
+        Optional<Node> result = Optional.empty();
+        while (iterator.hasNext()) {
+            Node next = iterator.next();
+            if (next.equals(node)) {
+                result = Optional.of(next);
+            }
+        }
+        return result;
+    }
 }
