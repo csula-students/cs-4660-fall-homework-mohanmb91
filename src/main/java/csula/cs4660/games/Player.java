@@ -151,7 +151,6 @@ class TileTron {
     public int hashCode() {
         int result = getX();
         result = 31 * result + getY();
-        result = 31 * result + (getType() != null ? getType().hashCode() : 0);
         return result;
     }
 }
@@ -387,26 +386,36 @@ class GraphTron{
 }
 class Player {
 	static int floodFillCount = 0;
+	static HashMap<Integer,List<PointXY>> playersLocationsTrack = new HashMap<>();
 	static NodeTron rootNode = null;
+	static int radius = 50;
 	static Integer Alpha = Integer.MIN_VALUE;
 	static Integer Beta = Integer.MAX_VALUE;
+	static List<NodeTron<TileTron>> visitedNodes;
 	static Map <PointXY,TileTron> tileMap = new HashMap<PointXY,TileTron>();
 	static int P;
     private long startTime;
     static final int rows = 20;
     static final int columns = 30;
+    static int N;
+    static int NCopy = 0;
+    static int level = 1;
     public static void main(String args[]) {
-    	  Scanner in = new Scanner(System.in);
+    	Scanner in = new Scanner(System.in);
         String currentMove = "", previousMove = "";
     	long startTime = System.currentTimeMillis();
     	//code
         int board[][] = new int[rows][columns];
-        GraphTron graphs = parseIntoTiles(board);
+        
         long endTime = System.currentTimeMillis();
+        GraphTron graphs = parseIntoTiles(board);
     	System.err.println("Took "+(endTime - startTime) + " ms");
     	List<PointXY> opponentsLocations = new ArrayList<PointXY>();
         while (true) {
-            int N = in.nextInt(); // total number of players (2 to 4).
+            N = in.nextInt(); // total number of players (2 to 4).
+            if(NCopy == 0){
+            	NCopy = N;
+            }
             P = in.nextInt(); // your player number (0 to 3).
             int currentRow =0;
             int currentColumn = 0;
@@ -415,12 +424,20 @@ class Player {
                 int Y0 = in.nextInt(); // starting Y coordinate of lightcycle (or -1)
                 int X1 = in.nextInt(); // starting X coordinate of lightcycle (can be the same as X0 if you play before this player)
                 int Y1 = in.nextInt(); // starting Y coordinate of lightcycle (can be the same as Y0 if you play before this player)
+                if(X0 != -1){
                 board[Y1][X1] = i+1;
                 Optional<NodeTron> beforeUpdatedNode =  graphs.getNode(new NodeTron<TileTron>(new TileTron(Y1,X1,"0")));
-                NodeTron<TileTron> converted = ((NodeTron<TileTron>) beforeUpdatedNode.get());
-                converted.setData(new TileTron(Y1,X1,(i+1)+""));
-                
-              //((MiniMaxStateTron) graph.getNode(source).get().getData()).setValue(((MiniMaxStateTron)bestValue.getData()).getValue());
+                NodeTron<TileTron> afterUpdateNode = ((NodeTron<TileTron>) beforeUpdatedNode.get());
+                afterUpdateNode.setData(new TileTron(Y1,X1,(i+1)+""));
+                if(!playersLocationsTrack.containsKey(i)){
+                	List<PointXY> playersMoves = new ArrayList<>();
+                	playersMoves.add(new PointXY(Y1, X1));
+                	playersLocationsTrack.put(i, playersMoves);
+                }else{
+                	List<PointXY> playersMoves = playersLocationsTrack.get(i);
+                	playersMoves.add(new PointXY(Y1, X1));
+                	playersLocationsTrack.put(i, playersMoves);
+                }
                 if(i == P){ 
                     System.err.println(X0+"-"+Y0+"-"+X1+"-"+Y1);
                     currentRow = Y1;
@@ -429,29 +446,107 @@ class Player {
                 else{
                 	opponentsLocations.add(new PointXY(Y1, X1));
                 }
+                }else{
+                	if(playersLocationsTrack.containsKey(i)){
+                		NCopy = NCopy - 1;
+                		graphs  = removeFromBoard(board,playersLocationsTrack.get(i),(i+1)+"",graphs);
+                		playersLocationsTrack.remove(i);
+                	}
+                }
             }
-            GraphTron graphMinMax = new GraphTron();
-            graphMinMax = buildGraph(board,currentColumn,currentRow,opponentsLocations);
             String initialState = currentRow+"+"+currentColumn;
         	for(PointXY eachOpponentLocation : opponentsLocations){
         		initialState += "#" + eachOpponentLocation.getX() + "+" + eachOpponentLocation.getY();
         	}
-            NodeTron best = getBestMove(graphMinMax, new NodeTron<MiniMaxStateTron>(new MiniMaxStateTron(board, 0 , initialState)), 4, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+        	rootNode = null;
+        	if(isEnemyClose( new PointXY(currentRow, currentColumn), opponentsLocations )){
+        		 GraphTron graphMinMax = new GraphTron();
+                 graphMinMax = buildGraph(board,currentColumn,currentRow,opponentsLocations);
+        		NodeTron best = getBestMove(graphMinMax, new NodeTron<MiniMaxStateTron>(new MiniMaxStateTron(board, 0 , initialState)), 3, true);
+        		 int rowInitial = Integer.parseInt(initialState.split("#")[P].split("\\+")[0]);
+                 int columnInitial = Integer.parseInt(initialState.split("#")[P].split("\\+")[1]);
+                 int row = Integer.parseInt(((MiniMaxStateTron) best.getData()).getRecentMoves().split("#")[P].split("\\+")[0]);
+                 int column = Integer.parseInt(((MiniMaxStateTron) best.getData()).getRecentMoves().split("#")[P].split("\\+")[1]);
+                 currentMove = getMove(rowInitial,columnInitial,row,column);
+        	}else{
+        		Optional<NodeTron> currentNode =  graphs.getNode(new NodeTron<TileTron>(new TileTron(currentRow,currentColumn,(P+1)+"")));
+                NodeTron currentNodeOfPlayer = (NodeTron) currentNode.get();
+                NodeTron<TileTron> longestPathNode = null;
+                int max = 0;
+                for(NodeTron<TileTron> eachNode : graphs.neighbors(new NodeTron<TileTron>(new TileTron(currentRow,currentColumn,(P+1)+"")))){
+                	visitedNodes =  new ArrayList<NodeTron<TileTron>>();
+                	int lengthOfTheChildNode = getLongestPathNode(graphs,eachNode);
+                	if(max < lengthOfTheChildNode){
+                		max = lengthOfTheChildNode;
+                		longestPathNode = eachNode;
+                	}
+                }
+                currentMove = getMove(currentRow,currentColumn,longestPathNode.getData().getX(),longestPathNode.getData().getY());
+        	}
+            
             //debugBoard(board);
-            currentMove = avoidBlock(board, currentRow+"+"+currentColumn,previousMove);
-//            int rowInitial = Integer.parseInt(initialState.split("#")[P].split("\\+")[0]);
-//            int columnInitial = Integer.parseInt(initialState.split("#")[P].split("\\+")[1]);
-//            int row = Integer.parseInt(((MiniMaxStateTron) best.getData()).getRecentMoves().split("#")[P].split("\\+")[0]);
-//            int column = Integer.parseInt(((MiniMaxStateTron) best.getData()).getRecentMoves().split("#")[P].split("\\+")[1]);
-//            currentMove = getMove(rowInitial,columnInitial,row,column);
+           
+            if(currentMove.equals("")){
+            	currentMove = avoidBlock(board, currentRow+"+"+currentColumn,previousMove);
+            	System.err.println("ran by Simple Avoid Block");
+            }
             System.out.println(currentMove);
             previousMove = currentMove;
             opponentsLocations =  new ArrayList<PointXY>();
              // A single line with UP, DOWN, LEFT or RIGHT
         }
     }
+    private static GraphTron removeFromBoard(int[][] board, List<PointXY> playerMoves, String playerNumber, GraphTron graphs) {
+    	for(PointXY eachLocationOfPlayer: playerMoves){
+			board[eachLocationOfPlayer.getX()][eachLocationOfPlayer.getY()] = 0;
+			Optional<NodeTron> beforeUpdatedNode =  graphs.getNode(new NodeTron<TileTron>(new TileTron(eachLocationOfPlayer.getX(),eachLocationOfPlayer.getY(),playerNumber)));
+	         NodeTron<TileTron> afterUpdateNode = ((NodeTron<TileTron>) beforeUpdatedNode.get());
+	         afterUpdateNode.setData(new TileTron(eachLocationOfPlayer.getX(),eachLocationOfPlayer.getY(),"0"));
+		}
+    	 
+		return graphs;
+	}
+	private static boolean isEnemyClose(PointXY myLocation, List<PointXY> opponentsLocations) {
+    	for(PointXY eachOpponentLocation : opponentsLocations){
+    		int dx = Math.abs(myLocation.getX() - eachOpponentLocation.getX());
+       	  	int dy = Math.abs(myLocation.getY() - eachOpponentLocation.getY());
+       	  	if(N > 3){
+       	  		level = 1;
+       	  	}else{
+	           	level = 2;
+            }
+       	  	if((dx + dy) < radius ){
+       	  		return true;
+       	  	}
+    	}
+    	 
+		return false;
+	}
+	private static int getLongestPathNode(GraphTron graphs,NodeTron<TileTron> eachNode) {
+    	visitedNodes.add(eachNode);
+    	    if(! hasUnvisitedNode(graphs.neighbors(eachNode))){
+    	         return 0;
+    	    }else{
+    	        int maxDepth = 0;
+
+    	        for(NodeTron<TileTron> child : graphs.neighbors(eachNode)){
+    	        	if(!visitedNodes.contains(child) && child.getData().getType() == "0" ){
+    	        		maxDepth = Math.max(maxDepth, getLongestPathNode(graphs,child));
+    	        	}
+    	        }
+    	        return maxDepth + 1;
+    	    }
+    }
+    private static boolean hasUnvisitedNode(List<NodeTron> neibhourNodes) {
+		// TODO Auto-generated method stub
+		for(NodeTron<TileTron> eachNode : neibhourNodes){
+			 if(! visitedNodes.contains(eachNode)){
+				 return true;
+			 }
+		}
+		return false;
+	}
     private static String getMove(int rowInitial, int columnInitial, int row, int column) {
-    	System.err.println(rowInitial + "-"+columnInitial + "-" + row + "-" + column);
 		if(row < rowInitial ){
 			return "UP";
 		}
@@ -461,8 +556,11 @@ class Player {
 		else if(column < columnInitial ){
 			return "LEFT";
 		}
-		else{
+		else if (column > columnInitial ){
 			return "RIGHT";
+		}
+		else{
+			return "";
 		}
 		
 	}
@@ -493,7 +591,14 @@ class Player {
 
         TreeMap<String, String> possibleMoves = new TreeMap<String, String>();
         NodeTron<MiniMaxStateTron> lastNode = start;
-        int level = 3;
+//        int level;
+//        if(N > 3){
+//        level = 1;
+//        radius = 15;
+//        }else{
+//        	level = 2;
+//        	radius = 100;
+//        }
     	while(level > 0 && !frontier.isEmpty()){
     		NodeTron<MiniMaxStateTron> currentNode = frontier.poll();
     		if(currentNode.equals(lastNode)){
@@ -572,8 +677,7 @@ class Player {
     		result.put(key, value);
         	}
     	}
-    	
-		return result;
+    	return result;
 	}
 
 	private static GraphTron parseIntoTiles(int[][] board) {
@@ -647,14 +751,9 @@ class Player {
 }
 	private static String avoidBlock(int[][] board, String currentXY,String previousMove) {
 		// TODO Auto-generated method stub
-    	HashMap<String , String > possibleMoves = getPossibleMoves(board,currentXY);
-    	if(possibleMoves.containsKey(previousMove)){
-    		return previousMove;
-    	}
-    	for(String eachPossibleMove: possibleMoves.keySet()){
-    		return eachPossibleMove;
-    	}
-    	return "Right";
+    	return getPossibleMoves(board,currentXY);
+    	
+    	
 	}
 	 private static TreeMap<String,String> getPossibleMovesTreeMap(int[][] board, String currentXY) {
 	        TreeMap<String,String> possibleMoves = new TreeMap<String, String>();
@@ -665,38 +764,39 @@ class Player {
 	    	if(row + 1 < rows && board[row +1][column] < 1){
 	    		possibleMoves.put("DOWN",(row+1)+"+"+column);
 			}
-			if((row -1 < rows && row -1 >= 0) && board[row  - 1][column] < 1){
+			if(row -1 >= 0 && board[row  - 1][column] < 1){
 				possibleMoves.put("UP",(row-1)+"+"+column);
 			}
 			if(column + 1 < columns && board[row][column + 1] < 1){
 				possibleMoves.put("RIGHT",row+"+"+(column+1));
 			}
-			if((column - 1 < columns && column - 1 >= 0) && board[row][column - 1] < 1){
+			if(column - 1 >= 0 && board[row][column - 1] < 1){
 				possibleMoves.put("LEFT",row+"+"+(column-1));
 			}
-	    	
 	    	return possibleMoves;
 	    }
-    private static HashMap<String,String> getPossibleMoves(int[][] board, String currentXY) {
+    private static  String getPossibleMoves(int[][] board, String currentXY) {
         HashMap<String,String> possibleMoves = new HashMap<String, String>();
     	String XY[] = currentXY.split("\\+");
     	int row = Integer.parseInt(XY[0]);
     	int column = Integer.parseInt(XY[1]);
-    	
+    	System.err.println(row + "=====> " + column);
     	if(row + 1 < rows && board[row +1][column] < 1){
     		possibleMoves.put("DOWN",(row+1)+"+"+column);
 		}
-		if((row -1 < rows && row -1 >= 0) && board[row  - 1][column] < 1){
+		if(row -1 >= 0  && board[row  - 1][column] < 1){
 			possibleMoves.put("UP",(row-1)+"+"+column);
 		}
 		if(column + 1 < columns && board[row][column + 1] < 1){
 			possibleMoves.put("RIGHT",row+"+"+(column+1));
 		}
-		if((column - 1 < columns && column - 1 >= 0) && board[row][column - 1] < 1){
+		if(column - 1 >= 0 && board[row][column - 1] < 1){
 			possibleMoves.put("LEFT",row+"+"+(column-1));
 		}
-    	
-    	return possibleMoves;
+    	System.err.println("size ==== > " + possibleMoves.size());
+    	String result = possibleMoves.keySet().iterator().next();
+    	System.err.println(result);
+    	return result;
     }
     private static String getFirstPossibleMove(int[][] board, String currentXY) {
         HashMap<String,String> possibleMoves = new HashMap<String, String>();
@@ -729,7 +829,7 @@ class Player {
         }
 
 	    @SuppressWarnings({ "rawtypes", "unchecked" })
-		public static NodeTron getBestMove(GraphTron graph, NodeTron<MiniMaxStateTron> source, Integer depth, Integer alpha, Integer beta, Boolean max) {
+		public static NodeTron getBestMove(GraphTron graph, NodeTron<MiniMaxStateTron> source, Integer depth, Boolean max) {
 	        // TODO: implement your alpha beta pruning algorithm here
 
 	    	if(rootNode == null){
@@ -737,24 +837,17 @@ class Player {
 	    	}
 	    	NodeTron bestValue;
 	        if (depth == 0 || graph.neighbors(source).size() == 0) {
-//	            evaluvateState(source);
-//	            int value = floodFillCount;
-//	            source.getData().setValue(value);
+	            	
+	            int value =evaluvateState(source); 
+	            source.getData().setValue(value);
 	        	return source; // return a number
 	        }
 
 	        if (max) {
 	            bestValue =new NodeTron<>(new MiniMaxStateTron(null, Integer.MIN_VALUE,"")); // negative infinite
 	            for (NodeTron eachNode: graph.neighbors(source)) {
-	                NodeTron value = getBestMove(graph,eachNode, depth - 1, alpha, beta, !max);
-	                if(alpha < ((MiniMaxStateTron)value.getData()).getValue() ){
-	       			 alpha = ((MiniMaxStateTron)value.getData()).getValue();
-	       			if(beta < alpha){
-	       				bestValue = compareNodesMin(bestValue, value);
-	       				break;
-	       			}
-	       		 	}
-	                bestValue = compareNodesMax(bestValue, value);
+	                NodeTron value = getBestMove(graph,eachNode, depth - 1, !max);
+	               bestValue = compareNodesMax(bestValue, value);
 	            }
 	            if( !(((MiniMaxStateTron) source.getData()).getRecentMoves()).equals(((MiniMaxStateTron) rootNode.getData()).getRecentMoves())){
 	            bestValue = new NodeTron(new MiniMaxStateTron( ((MiniMaxStateTron) source.getData()).getState() , ((MiniMaxStateTron)bestValue.getData()).getValue(), ((MiniMaxStateTron) source.getData()).getRecentMoves() ));
@@ -764,14 +857,7 @@ class Player {
 	        } else {
 	        	bestValue =new NodeTron<>(new MiniMaxStateTron(null, Integer.MAX_VALUE,"")); // positive infinite
 	        	 for (NodeTron eachNode: graph.neighbors(source)) {
-	        		 NodeTron value = getBestMove(graph,eachNode, depth - 1, alpha, beta, !max);
-	        		 if(beta > ((MiniMaxStateTron)value.getData()).getValue() ){
-	        			 beta = ((MiniMaxStateTron)value.getData()).getValue();
-	        			 if(beta < alpha){
-	        				 bestValue = compareNodesMin(bestValue, value);
-	        				 break;
-	        			 }
-	        		 }
+	        		NodeTron value = getBestMove(graph,eachNode, depth - 1, !max);
 	                bestValue = compareNodesMin(bestValue, value);
 	            }
 	        	 if( !(((MiniMaxStateTron) source.getData()).getRecentMoves()).equals(((MiniMaxStateTron) rootNode.getData()).getRecentMoves())){
@@ -784,40 +870,129 @@ class Player {
 	    }
 	    
 	    private static int evaluvateState(NodeTron<MiniMaxStateTron> source) {
-			int x = Integer.parseInt(((source.getData().getRecentMoves()).split("#")[P]).split("\\+")[0]);
-			int y = Integer.parseInt(((source.getData().getRecentMoves()).split("#")[P]).split("\\+")[1]);
-			String firstMove =  getFirstPossibleMove(source.getData().getState(), x+"+"+y);
-			floodFillCount = 0;
-			if(firstMove.equals("Down")){
-				floodFill(x + 1,y,firstMove,source.getData().getState());	
-			}
-			else if(firstMove.equals("UP")){
-				floodFill(x - 1,y,firstMove,source.getData().getState());	
-			}
-			else if(firstMove.equals("RIGHT")){
-				floodFill(x,y + 1,firstMove,source.getData().getState());	
-			}
-			else{
-				floodFill(x,y - 1,firstMove,source.getData().getState());	
-			}
-			return floodFillCount;
-		}
-	    public static void floodFill( int x, int y, String move,int[][] board) {
-	    	  if ( (x >=0 && x < 20 && y >=0 && y <30) && (board[x][y] == 0) ) {
-	    	      board[x][y] = P +1;
-	    	      floodFillCount++;
-	    	     // System.err.println("FLOOD FILL COUNT: " + Player.floodFillCount);
-	    	      
-	    	      floodFill( x, y -1, "LEFT" ,board); 
-	    	      floodFill( x+1, y, "DOWN",board);
-	    	      floodFill( x-1, y, "UP",board);
-	    	      floodFill( x, y+1, "RIGHT" ,board);
-	    	  } else {
-	    	     // System.err.println("No move");
-	    	     //System.err.println("FLOOD FILL COUNT: " + floodFillCount);
-	    	      return;
-	    	  }
+	    	
+	    	Queue<String> frontier = new LinkedList<>();
+    		int playerCountCellCount,otherPlayersCellCount,wall = 9;
+    		playerCountCellCount = otherPlayersCellCount = 0;
+			int [][] currentBoardState = deepCopyIntMatrix(source.getData().getState());
+	    	String playerCurrentLocation[] = source.getData().getRecentMoves().split("#");
+	    	HashMap<String, Integer> cellWithParents = new HashMap<>();
+	    	int i = 0;
+	    	for(String eachPlayerLocation : playerCurrentLocation){
+	    		if(! cellWithParents.containsKey(eachPlayerLocation)){
+	    			cellWithParents.put(eachPlayerLocation, i+1);
+	    		}
+	    		frontier.add(eachPlayerLocation);
+	    		i++;
 	    	}
+	    	
+	    	while(! frontier.isEmpty()){
+	    		String key = frontier.poll();
+	    		String rowColumn[] = key.split("\\+"); 
+	    		int x = Integer.parseInt(rowColumn[0]);
+	    		int y = Integer.parseInt(rowColumn[1]);
+	    		
+	    		if(x + 1 < rows && (currentBoardState[x + 1][y] == 0 || currentBoardState[x + 1][y] > 4 && currentBoardState[x + 1][y] <= 20)){
+	    			String newKey = (x+1) + "+" + y;
+	    			if(currentBoardState[x + 1][y] == 0){
+	    			cellWithParents.put(newKey, cellWithParents.get(key));
+	    			currentBoardState[x+1][y] = cellWithParents.get(key) + 4;
+	    			if(P + 1 + 4 == currentBoardState[x+1][y]){
+	    				playerCountCellCount += 1;
+	    			}else{
+	    				otherPlayersCellCount += 1;
+	    			}
+	    			frontier.add(newKey);
+	    			}else{
+	    				if(cellWithParents.get(newKey) != cellWithParents.get(key)){
+	    					if(currentBoardState[x + 1][y] > 4 && currentBoardState[x + 1][y] != wall){
+	    						if(P + 1 + 4 == currentBoardState[x + 1][y]){
+	    		    				playerCountCellCount -= 1;
+	    		    			}else{
+	    		    				otherPlayersCellCount -= 1;
+	    		    			}
+		    				currentBoardState[x + 1][y] = wall;
+	    					}
+		    			}
+	    			}
+	    		}
+	    		if(x - 1 >= 0 && (currentBoardState[x - 1][y] == 0 || currentBoardState[x - 1][y] > 4 && currentBoardState[x - 1][y] <= 20)){
+	    			String newKey = (x-1) + "+" + y;
+	    			if(currentBoardState[x - 1][y] == 0){
+	    			cellWithParents.put(newKey, cellWithParents.get(key));
+	    			currentBoardState[x-1][y] = cellWithParents.get(key) + 4;
+	    			if(P + 1 + 4 == currentBoardState[x-1][y]){
+	    				playerCountCellCount += 1;
+	    			}else{
+	    				otherPlayersCellCount += 1;
+	    			}
+	    			frontier.add(newKey);
+	    			}else{
+	    				if(cellWithParents.get(newKey) != cellWithParents.get(key)){
+	    					if(currentBoardState[x - 1][y] > 4 && currentBoardState[x - 1][y] != wall){
+	    						if(P + 1 + 4 == currentBoardState[x-1][y]){
+	    		    				playerCountCellCount -= 1;
+	    		    			}else{
+	    		    				otherPlayersCellCount -= 1;
+	    		    			}
+		    				currentBoardState[x - 1][y] = wall;
+	    					}
+		    			}
+	    			}
+	    		}
+	    		if(y + 1 < columns && (currentBoardState[x][y + 1] == 0 || currentBoardState[x][y + 1] > 4 && currentBoardState[x][y + 1] <= 20)){
+	    			String newKey = x + "+" + (y + 1);
+	    			if(currentBoardState[x][y+1] == 0){
+	    			cellWithParents.put(newKey, cellWithParents.get(key));
+	    			currentBoardState[x][y+1] = cellWithParents.get(key) + 4;
+	    			if(P + 1 + 4 == currentBoardState[x][y + 1]){
+	    				playerCountCellCount += 1;
+	    			}else{
+	    				otherPlayersCellCount += 1;
+	    			}
+	    			frontier.add(newKey);
+	    			}else{
+	    				if(cellWithParents.get(newKey) != cellWithParents.get(key)){
+	    					if(currentBoardState[x][y + 1] > 4  && currentBoardState[x][y + 1] != wall){
+	    						if(P + 1 + 4 == currentBoardState[x][y + 1]){
+	    		    				playerCountCellCount -= 1;
+	    		    			}else{
+	    		    				otherPlayersCellCount -= 1;
+	    		    			}
+		    				currentBoardState[x][y + 1] = wall;
+	    					}
+		    			}
+	    			}
+	    		}
+	    		if(y - 1 >= 0 && (currentBoardState[x][y - 1] == 0 || currentBoardState[x][y - 1] > 4 && currentBoardState[x][y - 1] <= 20)){
+	    			String newKey = x + "+" + (y - 1);
+	    			if(currentBoardState[x][y-1] == 0){
+	    			cellWithParents.put(newKey, cellWithParents.get(key));
+	    			currentBoardState[x][y-1] = cellWithParents.get(key) + 4;
+	    			if(P + 1 + 4 == currentBoardState[x][y - 1]){
+	    				playerCountCellCount += 1;
+	    			}else{
+	    				otherPlayersCellCount += 1;
+	    			}
+	    			frontier.add(newKey);
+	    			}else{
+	    				if(cellWithParents.get(newKey) != cellWithParents.get(key)){
+	    					if(currentBoardState[x][y-1] > 4  && currentBoardState[x][y - 1] != wall){
+	    						if(P + 1 + 4 == currentBoardState[x][y - 1]){
+	    		    				playerCountCellCount -= 1;
+	    		    			}else{
+	    		    				otherPlayersCellCount -= 1;
+	    		    			}
+		    				currentBoardState[x][y-1] = wall;
+	    					}
+		    			}
+	    			}
+	    		}
+	    	
+	    	}
+	    	//debugBoard(currentBoardState);
+	    	return playerCountCellCount - otherPlayersCellCount; 
+		}
 		private static NodeTron compareNodesMin(NodeTron<MiniMaxStateTron> bestValue, NodeTron<MiniMaxStateTron> value) {
 			if(((MiniMaxStateTron) bestValue.getData()).getValue() < value.getData().getValue()){
 				return bestValue;
