@@ -591,14 +591,7 @@ class Player {
 
         TreeMap<String, String> possibleMoves = new TreeMap<String, String>();
         NodeTron<MiniMaxStateTron> lastNode = start;
-//        int level;
-//        if(N > 3){
-//        level = 1;
-//        radius = 15; pull request change
-//        }else{
-//        	level = 2;
-//        	radius = 100;
-//        }
+
     	while(level > 0 && !frontier.isEmpty()){
     		NodeTron<MiniMaxStateTron> currentNode = frontier.poll();
     		if(currentNode.equals(lastNode)){
