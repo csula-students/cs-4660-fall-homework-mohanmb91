@@ -7,8 +7,7 @@ import csula.cs4660.graphs.Node;
 public class AlphaBeta {
     
     static Node rootNode = null;
-    static Integer Alpha = Integer.MIN_VALUE;
-    static Integer Beta = Integer.MAX_VALUE;
+    
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Node getBestMove(Graph graph, Node source, Integer depth, Integer alpha, Integer beta, Boolean max) {
         // TODO: implement your alpha beta pruning algorithm here

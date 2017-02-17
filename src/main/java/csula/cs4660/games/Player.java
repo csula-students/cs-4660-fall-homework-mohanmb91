@@ -462,7 +462,8 @@ class Player {
         	if(isEnemyClose( new PointXY(currentRow, currentColumn), opponentsLocations )){
         		 GraphTron graphMinMax = new GraphTron();
                  graphMinMax = buildGraph(board,currentColumn,currentRow,opponentsLocations);
-        		NodeTron best = getBestMove(graphMinMax, new NodeTron<MiniMaxStateTron>(new MiniMaxStateTron(board, 0 , initialState)), 3, true);
+        		//NodeTron best = getBestMove(graphMinMax, new NodeTron<MiniMaxStateTron>(new MiniMaxStateTron(board, 0 , initialState)), 3, true); // minmax
+                 NodeTron best = getBestMove(graphMinMax, new NodeTron<MiniMaxStateTron>(new MiniMaxStateTron(board, 0 , initialState)), 3,Integer.MIN_VALUE,Integer.MAX_VALUE, true); // alpha beta
         		 int rowInitial = Integer.parseInt(initialState.split("#")[P].split("\\+")[0]);
                  int columnInitial = Integer.parseInt(initialState.split("#")[P].split("\\+")[1]);
                  int row = Integer.parseInt(((MiniMaxStateTron) best.getData()).getRecentMoves().split("#")[P].split("\\+")[0]);
@@ -594,7 +595,7 @@ class Player {
 //        int level;
 //        if(N > 3){
 //        level = 1;
-//        radius = 15;
+//        radius = 15; pull request change
 //        }else{
 //        	level = 2;
 //        	radius = 100;
@@ -679,6 +680,7 @@ class Player {
     	}
     	return result;
 	}
+	
 
 	private static GraphTron parseIntoTiles(int[][] board) {
     	GraphTron graph = new GraphTron();
@@ -827,7 +829,61 @@ class Player {
                 System.err.println();
             }
         }
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static NodeTron<MiniMaxStateTron> getBestMove(GraphTron graph, NodeTron<MiniMaxStateTron> source, Integer depth, Integer alpha, Integer beta, Boolean max) {
+        // TODO: implement your alpha beta pruning algorithm here
 
+    	if(rootNode == null){
+    		  int value =evaluvateState(source); 
+	            source.getData().setValue(value);
+	        	return source; // return a number
+    	}
+    	NodeTron bestValue;
+        if (depth == 0 || graph.neighbors(source).size() == 0) {
+            return source; // return a number
+        }
+
+        if (max) {
+        	 bestValue =new NodeTron<>(new MiniMaxStateTron(null, Integer.MIN_VALUE,"")); // negative infinite
+            for (NodeTron eachNode: graph.neighbors(source)) {
+                NodeTron value = getBestMove(graph,eachNode, depth - 1, alpha, beta, !max);
+                if(alpha < ((MiniMaxStateTron)value.getData()).getValue() ){
+       			 alpha = ((MiniMaxStateTron)value.getData()).getValue();
+       			if(beta < alpha){
+       				bestValue = compareNodesMin(bestValue, value);
+       				break;
+       			}
+       		 	}
+                bestValue = compareNodesMax(bestValue, value);
+            }
+            if( !(((MiniMaxStateTron) source.getData()).getRecentMoves()).equals(((MiniMaxStateTron) rootNode.getData()).getRecentMoves())){
+	            bestValue = new NodeTron(new MiniMaxStateTron( ((MiniMaxStateTron) source.getData()).getState() , ((MiniMaxStateTron)bestValue.getData()).getValue(), ((MiniMaxStateTron) source.getData()).getRecentMoves() ));
+	            }
+	            ((MiniMaxStateTron) graph.getNode(source).get().getData()).setValue(((MiniMaxStateTron)bestValue.getData()).getValue());
+	            return bestValue;
+        } else {
+        	bestValue =new NodeTron<>(new MiniMaxStateTron(null, Integer.MAX_VALUE,"")); // positive infinite
+        	 for (NodeTron eachNode: graph.neighbors(source)) {
+        		 NodeTron value = getBestMove(graph,eachNode, depth - 1, alpha, beta, !max);
+        		 if(beta > ((MiniMaxStateTron)value.getData()).getValue() ){
+        			 beta = ((MiniMaxStateTron)value.getData()).getValue();
+        			 if(beta < alpha){
+        				 bestValue = compareNodesMin(bestValue, value);
+        				 break;
+        			 }
+        		 }
+                bestValue = compareNodesMin(bestValue, value);
+            }
+        	 if( !(((MiniMaxStateTron) source.getData()).getRecentMoves()).equals(((MiniMaxStateTron) rootNode.getData()).getRecentMoves())){
+	 	            bestValue = new NodeTron(new MiniMaxStateTron( ((MiniMaxStateTron) source.getData()).getState() , ((MiniMaxStateTron)bestValue.getData()).getValue(), ((MiniMaxStateTron) source.getData()).getRecentMoves() ));
+	 	            }
+	        	  ((MiniMaxStateTron) graph.getNode(source).get().getData()).setValue(((MiniMaxStateTron)bestValue.getData()).getValue());
+	            return bestValue;
+        }
+       
+    }
+    
+   
 	    @SuppressWarnings({ "rawtypes", "unchecked" })
 		public static NodeTron getBestMove(GraphTron graph, NodeTron<MiniMaxStateTron> source, Integer depth, Boolean max) {
 	        // TODO: implement your alpha beta pruning algorithm here
@@ -990,7 +1046,7 @@ class Player {
 	    		}
 	    	
 	    	}
-	    	//debugBoard(currentBoardState);
+	    	//debugBoard(currentBoardState); // pull request change
 	    	return playerCountCellCount - otherPlayersCellCount; 
 		}
 		private static NodeTron compareNodesMin(NodeTron<MiniMaxStateTron> bestValue, NodeTron<MiniMaxStateTron> value) {
